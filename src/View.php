@@ -62,7 +62,7 @@ class View
 	}
 	
 	//Insere variaveis no array appViewDataFix para substituir na View
-	public function setFixVars($var, $content = null, $method = false){
+	public function setFixVar($var, $content = null, $method = false){
       	if(!is_array($var)){
 			if(!($method)){
 				$this->dataFix["$var"] = $content;
@@ -171,7 +171,7 @@ class View
 				}
 			}
 		$xml .= (!is_null($node) AND !is_int($node)) ? '</'.$node.'>'."\n" : '';
-		return $xml;
+		return trim($xml);
 	}
 	
 	//ENCODE AN ARRAY TO JSON STRING

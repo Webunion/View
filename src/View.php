@@ -1,7 +1,7 @@
-<?php
-namespace Webunion\View;
+<?php namespace Webunion\View;
 
-Class View{
+class View
+{
 	private $path;
 	private $layout;
 	private $page;

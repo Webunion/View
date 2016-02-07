@@ -106,12 +106,11 @@ class View
     }
 
 	public function render( $page = null, $data = array() ){
-		//Substituo os dados armazenados em appViewDataFix desta nos layout e view
-		$this->replaceFixVars();
-		
 		if( !is_null($page) && !empty($page) ){
 			$this->loadPage( $page );			
 		}
+		//Substituo os dados armazenados em appViewDataFix desta nos layout e view
+		$this->replaceFixVars();	
 		
 		//Transforma os dados passados no array deste metodo em variaveis locais
 		if(!empty($data) AND is_array($data)){extract($data, EXTR_PREFIX_SAME, 'view');}

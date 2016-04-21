@@ -1,116 +1,243 @@
 <?php namespace Webunion\View;
 
+/**
+ * A very simple and lightweight View engine framework agnostic
+ */
 class View
 {
+	/**
+     * Default template directory.
+     * @var Directory
+     */
 	private $path;
-	private $layout;
-	private $page;
-	private $data = array();
-	private $dataFix = array();
 	
-	protected $appViewData = array();
-	protected $appViewDataFix = array();
-
-	public function __construct( $path ){
+	/**
+     * The content of the of the layout.
+     * @var Layout
+     */
+	private $layout;
+	
+	/**
+     * Collection of preassigned Pages and Partial.
+     * @var Pages
+     */	
+	private $pages = array();
+	
+	/**
+     * Collection of preassigned template data.
+     * @var Data
+     */
+	private $data = array();
+	
+	/**
+     * Collection of preassigned template CONSTANTS to be replaced in views/layouts {#VAR#}.
+     * @var FixData
+     */	
+	private $fixData = array();
+	
+	/**
+     * Create new View instance.
+	 *
+     * @param string $path the path wehre views and layout are placed
+     * @param string $layout preload an layout
+     * @param string $view preload an view
+     */
+	public function __construct($path, $layout = null, $view = null)
+	{
 		$this->path = $path;
-        $this->loadLayout();
-        $this->loadPage();
+        $this->loadLayout($layout);
+        $this->loadPage($view);
 	}
 	
-	public function loadLayout( $file = 'default' ){
+	/**
+     * Load a layout content.
+	 *
+     * @param  string $file the relative address and name of the layout file.
+     * @return null
+     */
+	public function loadLayout($file)
+	{
+		$file = $file ? $file : 'default';
 		$file = str_replace('/', DIRECTORY_SEPARATOR, $file);
 		$file = $this->path . DIRECTORY_SEPARATOR . 'layouts'. DIRECTORY_SEPARATOR . $file.'.php';
-		if( is_file( $file) ){
-			$this->layout = file_get_contents( $file );
+		if (is_file($file)) {
+			$this->layout = file_get_contents($file);
 		}
-		else{
-			throw new \Exception('Layout not find');
+		else {
+			throw new \Exception('Layout not found');
 		}
 	}
 	
-	public function loadPage( $file = 'default' ){
+	/**
+     * Load a view content.
+	 *
+     * @param  string $file the relative address and name of the layout file.
+     * @return null
+     */
+	public function loadPage($file)
+	{
+		$file = $file ? $file : 'default';
 		$file = str_replace('/', DIRECTORY_SEPARATOR, $file);
 		$file = $this->path . DIRECTORY_SEPARATOR . 'pages'. DIRECTORY_SEPARATOR . $file.'.php';
-		if( is_file( $file) ){
-			$this->page = file_get_contents( $file );
+		if (is_file($file)) {
+			$this->pages['appPage'] = file_get_contents($file);
 		}
-		else{
-			throw new \Exception('View not find');
+		else {
+			throw new \Exception('View not found');
 		}
 	}
+	
+	/**
+     * Load a view content.
+	 *
+     * @param  string $name the name to be used like a array key in $this->pages.
+     * @param  string $file the relative address and name of the layout file.
+     * @return null
+     */
+	public function loadPartial($name, $file)
+	{
+		$file = str_replace('/', DIRECTORY_SEPARATOR, $file);
+		$file = $this->path . DIRECTORY_SEPARATOR . 'pages'. DIRECTORY_SEPARATOR . $file.'.php';
+		if (is_file($file)) {
+			$this->pages[$name] = file_get_contents($file);
+		}
+		else {
+			throw new \Exception('Partial not found');
+		}
+		$this->pages = array_reverse($this->pages);
+	}
 
-	//Insere variaveis no array appViewData para exibir na View
-    public function setVar($var, $content = null, $method = false){
-        if(!is_array($var)){
-			if(!($method)){
-				$this->data["$var"] = $content;
+	/**
+     * Alias to setVar.
+	 *
+     * @param  string|array $name the variable name.
+     * @param  string $content the variable content.
+     * @param  boolean $method
+     * @return null
+     */
+	public function addData($name, $content = null, $method = false){
+		$this->setVar($name, $content, $method);
+	}
+	
+	/**
+     * Add preassigned template data.
+	 *
+     * @param  string|array $name the variable name.
+     * @param  string $content the variable content.
+     * @param  boolean $method
+     * @return null
+     */
+    public function setVar($name, $content = null, $method = false)
+	{
+        if (!is_array($name)) {
+			if (!$method) {
+				$this->data[$name] = $content;
 			}
-			else{
-				array_key_exists($var, $this->data) ? $this->data["$var"] .= $content : $this->data["$var"] = $content;
+			else {
+				array_key_exists($name, $this->data) ? $this->data[$name] .= $content : $this->data[$name] = $content;
 			}
 		}
 		else{
-			foreach($var AS $key=>$value){
-				if(is_null($method)){
-					$this->data["$key"] = $value;
+			foreach ($name AS $key=>$value) {
+				if (is_null($method)) {
+					$this->data[$key] = $value;
 				}
-				else{
-					array_key_exists($key, $this->data) ? $this->data["$key"] .= $value : $this->data["$key"] = $value;
+				else {
+					array_key_exists($key, $this->data) ? $this->data[$key] .= $value : $this->data[$key] = $value;
 				}
 			}
 		}
 	}
 	
-	//Insere variaveis no array appViewDataFix para substituir na View
-	public function setFixVar($var, $content = null, $method = false){
-      	if(!is_array($var)){
-			if(!($method)){
-				$this->dataFix["$var"] = $content;
+	/**
+     * Alias to setFixVar.
+	 *
+     * @param  string|array $name the variable name.
+     * @param  string $content the variable content.
+     * @param  boolean $method
+     * @return null
+     */
+	public function addFixData($name, $content = null, $method = false){
+		$this->setFixVar($name, $content, $method);
+	}
+	
+	
+	/**
+     * Add preassigned template CONSTANT {#DATA#}.
+	 *
+     * @param  string|array $name the variable name.
+     * @param  string $content the variable content.
+     * @param  boolean $method
+     * @return null
+     */
+	public function setFixVar($name, $content = null, $method = false)
+	{
+      	if (!is_array($name)) {
+			if (!$method) {
+				$this->fixData[$name] = $content;
 			}
-			else{
-				array_key_exists($var, $this->dataFix) ? $this->dataFix["$var"] .= $content : $this->dataFix["$var"] = $content;
+			else {
+				array_key_exists($name, $this->fixData) ? $this->fixData[$name] .= $content : $this->fixData[$name] = $content;
 			}
 		}
-		else{
-			foreach($var AS $key=>$value){
-				if(is_null($method)){
-					$this->dataFix["$key"] = $value;
+		else {
+			foreach ($name AS $key=>$value) {
+				if (is_null($method)) {
+					$this->fixData[$key] = $value;
 				}
 				else{
-					array_key_exists($key, $this->dataFix) ? $this->dataFix["$key"] .= $value : $this->dataFix["$key"] = $value;
+					array_key_exists($key, $this->fixData) ? $this->fixData[$key] .= $value : $this->fixData[$key] = $value;
 				}
 			}
 		}
    }
 
-	//Substiui marcacoes na View diretamente, precisa instanciar a view antes de chamar este metodo
-    public function replaceVars($var, $content){
-        $this->layout 	= str_replace("{#$var#}", $content, $this->layout);
-		$this->page 	= str_replace("{#$var#}", $content, $this->page);
-	}
-	
-	//Substitui variaveis da view/layout (marcadas com tag) por dados do appViewDataFix
-	public function replaceFixVars(){
-		if(!empty($this->dataFix) AND is_array($this->dataFix)){
-			foreach($this->dataFix AS $key=>$value){
+	/**
+     * Replace FixVars markedwith {#VAR#} in layout and pages/partials.
+	 *
+     * @return null
+     */
+	public function replaceFixVars()
+	{
+		if (!empty($this->fixData) AND is_array($this->fixData)) {
+			foreach ($this->fixData AS $key=>$value) {				
 				$this->layout 	= str_replace('{#'.$key.'#}', $value, $this->layout);
-				$this->page 	= str_replace('{#'.$key.'#}', $value, $this->page);
+				foreach ($this->pages AS $k=>$v) {
+					$this->pages[$k] = str_replace('{#'.$key.'#}', $value, $v);
+				}
 			}		
 		}	
 	}
 
-	//Limpa variaveis na usadas na view e layout (maracads com tag)
-	protected function clearUnusedVars(){
-        $this->layout = preg_replace('[{#(.*)#}]', "", $this->layout);
-        $this->page = preg_replace('[{#(.*)#}]', "", $this->page);
+	/**
+     * Clear unused FixVars in layout and pages/partials.
+	 *
+     * @return null
+     */
+	protected function clearUnusedVars()
+	{
+        $this->layout = preg_replace('[{#(.*)#}]', '', $this->layout);
+		
+		foreach ($this->pages AS $k=>$v) {
+			$this->pages[$k] = preg_replace('[{#(.*)#}]', '', $v);
+		}
     }
 
-	public function render( $page = null, $data = array() ){
-		if( !is_null($page) && !empty($page) ){
-			$this->loadPage( $page );			
+	/**
+     * Render layouts, page and partials to a string.
+	 *
+	 * @param  string $page the relative address and name of the page file, if you didn't set it before.
+     * @param  array $data add preassigned template data.
+     * @return string
+     */
+	public function render($page = null, array $data = array())
+	{
+		if (!is_null($page) && !empty($page)) {
+			$this->loadPage($page);
 		}
-		//Substituo os dados armazenados em appViewDataFix desta nos layout e view
-		$this->replaceFixVars();	
+		
+		//Substituo os dados armazenados em appViewfixData desta nos layout e view
+		$this->replaceFixVars();
 		
 		//Transforma os dados passados no array deste metodo em variaveis locais
 		if(!empty($data) AND is_array($data)){extract($data, EXTR_PREFIX_SAME, 'view');}
@@ -122,15 +249,17 @@ class View
 		$this->clearUnusedVars();
 
 		//renderizo o código php na view e salvo na variavel appPage
-		ob_start();
-		eval('?>'.$this->page);
-		$appPage = ob_get_contents();
-		ob_end_clean();
 		
+			foreach ($this->pages AS $k=>$v) {
+				ob_start();
+				eval('?>'.$v);
+				${$k} = ob_get_contents();
+				ob_end_clean();
+			}
 		//renderizo o código php do layout (incluindo a view) e imprimo tudo
 		ob_start();
-		eval('?>'.$this->layout);
-		$retorno = ob_get_contents();
+			eval('?>'.$this->layout);
+			$retorno = ob_get_contents();
 		ob_end_clean();
 		
 		return $retorno;

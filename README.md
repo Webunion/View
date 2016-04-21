@@ -57,7 +57,6 @@ path
     </aside>>
 ```
 
-
 ``` php
 controller.php
 use Webunion\View;

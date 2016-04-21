@@ -250,10 +250,10 @@ class View
 
 		//renderizo o código php na view e salvo na variavel appPage
 		
-			foreach ($this->pages AS $k=>$v) {
+			foreach ($this->pages AS $webunionViewKey=>$webunionViewValue) {
 				ob_start();
-				eval('?>'.$v);
-				${$k} = ob_get_contents();
+				eval('?>'.$webunionViewValue);
+				${$webunionViewKey} = ob_get_contents();
 				ob_end_clean();
 			}
 		//renderizo o código php do layout (incluindo a view) e imprimo tudo

@@ -21,8 +21,9 @@ path
 	│		partial.php
 	│		...
 ```
-```html
+
 /path/views/layouts/default.php
+```php
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -41,8 +42,8 @@ path
 </html>
 ```
 
-```php
 /path/views/pages/home.php
+```php
     <?php echo $someVar;?>
     <ul>
     <? foreach($last AS $v):?>
@@ -50,15 +51,16 @@ path
     <?php endforeach;?>
     </ul>
 ```
-```php
+
 /path/views/pages/partials/partial.php
+```php
     <aside>
     <?php echo $someVar;?>
     </aside>>
 ```
 
-``` php
 controller.php
+``` php
 use Webunion\View;
 //The default layout and page are loaded automatically, but you can pass it as a parameter or using LoadLayout and LoadPage methods
 $view = new View('path/views/');

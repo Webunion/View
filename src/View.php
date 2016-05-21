@@ -33,7 +33,13 @@ class View
      * Collection of preassigned template CONSTANTS to be replaced in views/layouts {#VAR#}.
      * @var FixData
      */	
-	private $fixData = array();
+	private $fixData = array();	
+	
+	/**
+     * Define if the output should be compressed (remove HTML spaces, break lines adn comments)
+     * @var CompressOutput
+     */	
+	private $compressOutput =  false;
 	
 	/**
      * Create new View instance.
@@ -47,6 +53,30 @@ class View
 		$this->path = $path;
         $this->loadLayout($layout);
         $this->loadPage($view);
+	}
+	
+	/**
+     * Define if the output should be compressed.
+	 *
+     * @param  boolean $option
+     * @return null
+     */
+	public function setCompress($option = true){
+		$this->compressOutput = $option;
+	}
+	
+	/**
+     * Compress the output, removing HTML spaces, break lines and comments.
+	 *
+     * @param  string $content the HTML content to be compressed.
+     * @return string the HTML compressed content
+     */
+	private function compress($content)
+	{
+		return preg_replace(
+				array('/\>[^\S ]+/s','/[^\S ]+\</s','/(\s)+/s','#\s*<!--(?!\[if\s).*?-->\s*|(?<!\>)\n+(?=\<[^!])#s',), 
+				array('>','<','\\1',"",), 
+				$content);
 	}
 	
 	/**
@@ -260,8 +290,10 @@ class View
 		ob_start();
 			eval('?>'.$this->layout);
 			$retorno = ob_get_contents();
+			if ($this->compressOutput) {
+				$retorno = $this->compress($retorno);
+			}
 		ob_end_clean();
-		
 		return $retorno;
    }
       

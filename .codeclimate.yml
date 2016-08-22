@@ -1,19 +1,22 @@
 --- 
-engines: 
-  checks: 
-    Design/EvalExpression: ~
-    enabled: false
-  duplication: 
-    config: 
-      languages: 
+engines:
+  duplication:
+    config:
+      languages:
         - php
     enabled: true
   fixme: 
     enabled: true
-  phpcodesniffer: 
+  phpcodesniffer:
     enabled: true
+    config:
+      file_extensions: "php"
+      standard: "PSR1,PSR2"
   phpmd: 
     enabled: true
+    checks:
+      Design/EvalExpression:
+        enabled: false
 exclude_paths: 
   - tests/
 ratings: 

@@ -1,0 +1,25 @@
+--- 
+engines: 
+  checks: 
+    Design/EvalExpression: ~
+    enabled: false
+  duplication: 
+    config: 
+      languages: 
+        - php
+    enabled: true
+  fixme: 
+    enabled: true
+  phpcodesniffer: 
+    enabled: true
+  phpmd: 
+    enabled: true
+exclude_paths: 
+  - tests/
+ratings: 
+  paths: 
+    - "**.inc"
+    - "**.js"
+    - "**.jsx"
+    - "**.module"
+    - "**.php"

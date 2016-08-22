@@ -6,17 +6,19 @@
     "authors": [
         {
             "name": "Ricardo Fontanelli",
-            "email": "ricardo.fontanelli2@hotmail.com"
+            "email": "ricardo.fontanelli@hotmail.com"
         }
     ],
     "require": {
         "php": ">=5.3.0"
     },
-	"autoload": {
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    },
+    "autoload": {
         "psr-4": {
             "Webunion\\View\\": "src/"
         }
     },
     "minimum-stability": "dev"
 }
-

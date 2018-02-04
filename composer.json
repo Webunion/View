@@ -2,7 +2,7 @@
     "name": "webunion/view",
     "description": "Simple template engine",
     "keywords": ["View", "template engine"],
-    "license": "BSD Style",
+    "license": "MIT",
     "authors": [
         {
             "name": "Ricardo Fontanelli",
